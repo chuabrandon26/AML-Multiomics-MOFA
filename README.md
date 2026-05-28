@@ -1,5 +1,4 @@
-# MoBi Multi-Omics Analysis — AML Dataset
-### Student ID: 4745778 | Author: Chua
+# MoBi Multi-Omics Analysis using AML Dataset
 
 [![R](https://img.shields.io/badge/R-%3E%3D4.3-276DC3?logo=r&logoColor=white)](https://www.r-project.org/)
 [![Bioconductor](https://img.shields.io/badge/Bioconductor-DESeq2%20%7C%20MOFA2-87b13f)](https://bioconductor.org/)
@@ -57,8 +56,6 @@ multi_omics_report/
 ├── MoBiMultiOmic4745778Chua_mofamodel.hdf5
 └── MoBi_MultiOmic_4745778_Chua_files/
 └── figure-html/
-
-
 ---
 
 ## Methods
