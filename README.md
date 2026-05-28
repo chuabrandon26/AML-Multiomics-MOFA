@@ -42,6 +42,8 @@ The analysis first characterises each omics layer independently through preproce
 
 **Key clinical variables:** specimen type, vital status, disease stage, induction therapy response, age, white blood cell count, FLT3-ITD status, NPM1 mutation status, sex, ethnicity, processing centre ID.
 
+
+
 ---
 
 ## Repository Structure
@@ -57,6 +59,8 @@ multi_omics_report/
 └── MoBi_MultiOmic_4745778_Chua_files/
 └── figure-html/
 ---
+
+
 
 ## Methods
 
