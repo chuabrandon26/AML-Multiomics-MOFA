@@ -135,31 +135,31 @@ The raw count distribution is strongly right-skewed even after log10(count + 1) 
 
 ![RNA Mean Variance](MoBi_MultiOmic_4745778_Chua_files/figure-html/rna-mean-variance-1.png)
 
-After DESeq2 VST, the strong mean-dependent variance seen in raw counts is substantially reduced. Orange points are the 2,000 selected HVGs — genes that retain genuine biological variability across patients after normalisation. These genes exclusively drive PCA and the MOFA RNA view, ensuring that the multivariate analyses reflect biology rather than sequencing noise.
+After DESeq2 VST, the strong mean-dependent variance seen in raw counts is substantially reduced. Orange points are the 2,000 selected HVGs. Genes that retain genuine biological variability across patients after normalisation. These genes exclusively drive PCA and the MOFA RNA view, ensuring that the multivariate analyses reflect biology rather than sequencing noise.
 
 **RNA-seq Heatmap (Top Variable Genes)**
 
 ![RNA Heatmap](MoBi_MultiOmic_4745778_Chua_files/figure-html/rna-heatmap-1.png)
 
-Row-scaled heatmap of the 50 most variable genes with Ward D2 hierarchical clustering. Coordinated expression blocks across patient subgroups are clearly visible. Multiple co-expression patterns are consistent with the gradual RNA scree curve — AML transcriptional variation is distributed across several programmes rather than a single dominant binary split between patient groups.
+Row-scaled heatmap of the 50 most variable genes with Ward D2 hierarchical clustering. Coordinated expression blocks across patient subgroups are visible. Multiple co-expression patterns are consistent with the gradual RNA scree curve. AML transcriptional variation is distributed across several programmes rather than a single dominant binary split between patient groups.
 
 **RNA-seq PCA (PC1 vs PC2)**
 
 ![RNA PCA](MoBi_MultiOmic_4745778_Chua_files/figure-html/rna-pca-plot-1.png)
 
-The PCA plot reveals sample-level transcriptional structure, with points coloured by the most informative metadata variable selected automatically. Samples near the periphery of the PC1–PC2 plane may represent strong biological states (e.g., specific AML subtypes) or technical outliers worth investigating. Overlapping groups indicate that dominant expression gradients are continuous or multi-factorial rather than cleanly separating clinical categories.
+The PCA plot reveals sample-level transcriptional structure, with points coloured by the most informative metadata variable, automatically selected. Samples near the periphery of the PC1–PC2 plane may represent strong biological states (e.g., specific AML subtypes) or technical outliers that require further investigation. Overlapping groups indicate that dominant expression gradients are continuous or multi-factorial rather than cleanly separating clinical categories.
 
 **RNA-seq Scree Plot**
 
 ![RNA Scree](MoBi_MultiOmic_4745778_Chua_files/figure-html/rna-scree-plot-1.png)
 
-The gradual decline in variance explained from PC1 to PC10 confirms that RNA-seq variation in this AML cohort is distributed across multiple independent expression programmes. This contrasts with datasets dominated by a single axis such as a major cell-type gradient, and is the core transcriptomic justification for multi-factor integration with MOFA.
+The gradual decline in variance explained from PC1 to PC10 confirms that RNA-seq variation in this AML cohort is distributed across multiple independent expression programmes. This contrasts with datasets dominated by a single axis, such as a major cell-type gradient, and is the core transcriptomic justification for multi-factor integration with MOFA.
 
 **RNA-seq PCA Metadata Association Heatmap**
 
 ![RNA PCA Association Heatmap](MoBi_MultiOmic_4745778_Chua_files/figure-html/rna-pca-association-heatmap-1.png)
 
-Darker red tiles indicate stronger BH-adjusted evidence that a metadata variable explains a given PC score. Variables appearing dark across multiple PCs exert broad transcriptome-wide effects. This heatmap should be read alongside the scree plot — a strong association on PC1 carries substantially greater biological weight than the same p-value on PC8, which explains a much smaller fraction of total variance.
+Darker red tiles indicate stronger BH-adjusted evidence that a metadata variable explains a given PC score. Variables appearing dark across multiple PCs exert broad transcriptome-wide effects. This heatmap should be read alongside the scree plot. Indicating a strong association on PC1 carrying  greater biological weight than the same p-value on PC8, which explains a much smaller fraction of total variance.
 
 **RNA-seq PCA Coloured by Centre**
 
