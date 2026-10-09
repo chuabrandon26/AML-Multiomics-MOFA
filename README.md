@@ -1,31 +1,54 @@
-# MoBi Multi-Omics Analysis using AML Dataset
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/visual-abstract-dark.svg">
+  <img alt="Visual abstract: multi-omics factor analysis (MOFA2) of 200 acute myeloid leukemia patients across RNA-seq, a 14-gene mutation panel and 95 ex vivo inhibitor responses. Factor 1 explains 28.2 percent of variance across all three views and links kinase-inhibitor response to FLT3-ITD and NPM1 genotype, while Factor 4 tracks NPM1 status." src="assets/visual-abstract-light.svg" width="100%">
+</picture>
 
-[![R](https://img.shields.io/badge/R-%3E%3D4.3-276DC3?logo=r&logoColor=white)](https://www.r-project.org/)
-[![Bioconductor](https://img.shields.io/badge/Bioconductor-DESeq2%20%7C%20MOFA2-87b13f)](https://bioconductor.org/)
-[![License: Academic](https://img.shields.io/badge/License-Academic%20Use-blue.svg)]()
+<h1 align="center">AML Multi-Omics Integration with MOFA2</h1>
+
+<p align="center">
+  Transcriptome, targeted mutations and ex vivo drug response from 200 acute myeloid leukemia patients, integrated into shared latent factors
+</p>
+
+<p align="center">
+  <img alt="R: >= 4.3" src="https://img.shields.io/badge/R-%3E%3D%204.3-276DC3?logo=r&logoColor=white">
+  <img alt="Bioconductor: DESeq2 · MOFA2" src="https://img.shields.io/badge/Bioconductor-DESeq2%20%C2%B7%20MOFA2-1f8f6a">
+  <img alt="report: Quarto" src="https://img.shields.io/badge/report-Quarto-4a3aa7?logo=quarto&logoColor=white">
+  <img alt="Python: mofapy2" src="https://img.shields.io/badge/Python-mofapy2-e09a00?logo=python&logoColor=white">
+  <img alt="license: MIT" src="https://img.shields.io/badge/license-MIT-566573">
+</p>
+
+<p align="center">
+  <a href="#project-overview">Overview</a> &nbsp;·&nbsp; <a href="#methods">Methods</a> &nbsp;·&nbsp; <a href="#results--figure-interpretations">Results</a> &nbsp;·&nbsp; <a href="#conclusions">Conclusions</a> &nbsp;·&nbsp; <a href="#reproducibility">Reproducibility</a>
+</p>
 
 ---
 
-## Table of Contents
-1. [Project Overview](#project-overview)
-2. [Dataset Description](#dataset-description)
-3. [Repository Structure](#repository-structure)
-4. [Methods](#methods)
-5. [Results & Figure Interpretations](#results--figure-interpretations)
-6. [Conclusions](#conclusions)
-7. [Limitations](#limitations)
-8. [Reproducibility](#reproducibility)
-9. [Dependencies](#dependencies)
+## At a glance
 
----
+| **200** | **3** | **8** | **28.2%** | **p < 0.001** |
+|:---:|:---:|:---:|:---:|:---:|
+| patients (union of views) | omics views integrated | MOFA latent factors | variance, Factor 1 (all views) | Factor 4 vs NPM1 status |
+
+> **Take-home:** MOFA2 recovers a shared factor that links gene expression, kinase-inhibitor response and FLT3-ITD and NPM1 genotype, while a separate mutation-driven factor tracks NPM1 status. As a result, the integrated model reveals structure that no single omics layer shows on its own.
+
+## Skills demonstrated
+
+| Area | Evidence in this repository |
+|---|---|
+| **Multi-omics integration** | MOFA2 on the union of samples with view-appropriate likelihoods (Gaussian for RNA and drug AUC, Bernoulli for mutations) and missing views kept as missing |
+| **Transcriptomics** | DESeq2 size factors, variance-stabilizing transformation and selection of 2,000 highly variable genes |
+| **Pharmacogenomics** | Ex vivo inhibitor AUC processing, missingness filtering and MNN graph clustering of drug-response profiles |
+| **Statistics** | PCA and UMAP per view, ANOVA with Kruskal-Wallis sensitivity checks and Benjamini-Hochberg correction |
+| **Reproducible reporting** | One build script installs CRAN, Bioconductor and Python dependencies, trains or reloads the model, and renders a Quarto report with a fixed seed |
+| **Programming** | R (tidyverse, ggplot2, igraph, uwot) and Python (mofapy2) in an isolated virtual environment |
 
 ## Project Overview
 
 This project presents a fully reproducible **multi-omics integrative analysis** of an Acute Myeloid Leukaemia (AML) patient cohort. Three molecular layers are jointly analysed:
 
-- 🧬 **RNA-seq** — bulk transcriptomic profiles (gene expression counts)
-- 🔬 **Targeted gene mutations** — binary somatic mutation calls across a curated AML panel
-- 💊 **Ex vivo drug response** — area-under-the-curve (AUC) pharmacological sensitivity profiles
+- **RNA-seq**: bulk transcriptomic profiles (gene expression counts)
+- **Targeted gene mutations**: binary somatic mutation calls across a curated AML panel
+- **Ex vivo drug response**: area-under-the-curve (AUC) pharmacological sensitivity profiles
 
 The analysis first characterises each omics layer independently through preprocessing, dimensionality reduction (PCA + UMAP), and metadata association testing. It then integrates all three layers using **MOFA2 (Multi-Omics Factor Analysis v2)** to discover shared and view-specific sources of variation across patients.
 
@@ -49,15 +72,15 @@ The analysis first characterises each omics layer independently through preproce
 
 All four input files are loaded from the working directory. Sample identifiers are harmonised across tables and checked for consistency. A **sample overlap matrix** is constructed to determine which samples are available in each omics layer and their union/intersection sizes. Identifier mismatches are distinguished from genuine assay missingness.
 
-> **Design decision:** Rather than restricting analyses to complete-case samples, MOFA is run on the **union** of all sample IDs. Samples missing an entire view are represented with `NA` blocks — MOFA can still learn from partially observed samples.
+> **Design decision:** Rather than restricting analyses to complete-case samples, MOFA is run on the **union** of all sample IDs. Samples missing an entire view are represented with `NA` blocks: MOFA can still learn from partially observed samples.
 
 ### 2. RNA-seq Preprocessing (DESeq2)
 
 1. **Duplicate gene symbols** collapsed by summing counts
-2. **Low-expression filter** — genes must have count ≥ 10 in at least 5% of samples
-3. **DESeq2 size-factor normalisation** — corrects for sequencing depth differences
-4. **Variance-Stabilising Transformation (VST)** — reduces mean-variance dependency intrinsic to count data
-5. **Highly Variable Gene (HVG) selection** — top 2,000 genes by post-VST variance retained for PCA and MOFA
+2. **Low-expression filter**: genes must have count ≥ 10 in at least 5% of samples
+3. **DESeq2 size-factor normalisation**: corrects for sequencing depth differences
+4. **Variance-Stabilising Transformation (VST)**: reduces mean-variance dependency intrinsic to count data
+5. **Highly Variable Gene (HVG) selection**: top 2,000 genes by post-VST variance retained for PCA and MOFA
 
 > Raw counts are **not** used directly for PCA or MOFA because they are discrete, heteroscedastic, and library-size-confounded. VST-transformed HVGs provide a continuous, homoscedastic representation appropriate for Gaussian latent factor models.
 
@@ -99,11 +122,11 @@ MOFA2 is trained on all three views aligned to the union sample set:
 
 | Variable type | Test | Estimate reported |
 |--------------|------|------------------|
-| Categorical (≤ 8 groups) | One-way ANOVA | η² — fraction of score variance explained |
+| Categorical (≤ 8 groups) | One-way ANOVA | η², the fraction of score variance explained |
 | Continuous | ANOVA linear model | Slope coefficient |
 | Categorical (sensitivity check) | Kruskal-Wallis | Test statistic H |
 
-All p-values are BH-adjusted across all component × metadata pairs. Kruskal-Wallis serves as a non-parametric sensitivity check alongside ANOVA — concordance between both tests strengthens interpretation; discordance warrants caution.
+All p-values are BH-adjusted across all component × metadata pairs. Kruskal-Wallis serves as a non-parametric sensitivity check alongside ANOVA: concordance between both tests strengthens interpretation; discordance warrants caution.
 
 ---
 
@@ -113,7 +136,7 @@ All p-values are BH-adjusted across all component × metadata pairs. Kruskal-Wal
 
 ![Sample Overlap](MoBi_MultiOmic_4745778_Chua_files/figure-html/sample-overlap-plot-1.png)
 
-The tile heatmap shows which samples have measurements in each data layer. Most samples have RNA-seq, mutation, and metadata entries. The drug-response row shows the most systematic missingness — this is the bottleneck for complete-case integration. The structured absence pattern confirms assay-level missingness rather than scattered data loss, justifying the union-sample MOFA approach rather than discarding incomplete cases.
+The tile heatmap shows which samples have measurements in each data layer. Most samples have RNA-seq, mutation, and metadata entries. The drug-response row shows the most systematic missingness, which is the bottleneck for complete-case integration. The structured absence pattern confirms assay-level missingness rather than scattered data loss, justifying the union-sample MOFA approach rather than discarding incomplete cases.
 
 ---
 
@@ -123,7 +146,7 @@ The tile heatmap shows which samples have measurements in each data layer. Most 
 
 ![RNA Library Size](MoBi_MultiOmic_4745778_Chua_files/figure-html/rna-library-size-1.png)
 
-Substantial sequencing-depth variation is visible across samples. This confirms the necessity of DESeq2 size-factor normalisation before any distance-based analysis — without it, deeply sequenced samples would appear artificially distinct from shallow-sequenced ones regardless of their biological profiles.
+Substantial sequencing-depth variation is visible across samples. This confirms the necessity of DESeq2 size-factor normalisation before any distance-based analysis: without it, deeply sequenced samples would appear artificially distinct from shallow-sequenced ones regardless of their biological profiles.
 
 **Raw Count Distribution**
 
@@ -131,7 +154,7 @@ Substantial sequencing-depth variation is visible across samples. This confirms 
 
 The raw count distribution is strongly right-skewed even after log10(count + 1) transformation. The large spike near zero reflects the high proportion of zero or near-zero gene-sample entries. This motivates both the low-expression filter and the variance-stabilising transformation before multivariate analysis.
 
-**Mean–Variance Relationship After VST**
+**Mean-Variance Relationship After VST**
 
 ![RNA Mean Variance](MoBi_MultiOmic_4745778_Chua_files/figure-html/rna-mean-variance-1.png)
 
@@ -147,7 +170,7 @@ Row-scaled heatmap of the 50 most variable genes with Ward D2 hierarchical clust
 
 ![RNA PCA](MoBi_MultiOmic_4745778_Chua_files/figure-html/rna-pca-plot-1.png)
 
-The PCA plot reveals sample-level transcriptional structure, with points coloured by the most informative metadata variable, automatically selected. Samples near the periphery of the PC1–PC2 plane may represent strong biological states (e.g., specific AML subtypes) or technical outliers that require further investigation. Overlapping groups indicate that dominant expression gradients are continuous or multi-factorial rather than cleanly separating clinical categories.
+The PCA plot reveals sample-level transcriptional structure, with points coloured by the most informative metadata variable, automatically selected. Samples near the periphery of the PC1-PC2 plane may represent strong biological states (e.g., specific AML subtypes) or technical outliers that require further investigation. Overlapping groups indicate that dominant expression gradients are continuous or multi-factorial rather than cleanly separating clinical categories.
 
 **RNA-seq Scree Plot**
 
@@ -171,7 +194,7 @@ This plot directly interrogates potential batch effects from different processin
 
 ![RNA UMAP](MoBi_MultiOmic_4745778_Chua_files/figure-html/rna-umap-1.png)
 
-The RNA UMAP projects the first 10 RNA-seq PCs into 2D using a nearest-neighbour graph. Compact clusters indicate groups of samples with highly similar transcriptional profiles. The UMAP1–PC1 correlation coefficient reported alongside this figure quantifies how much of the embedding reflects the leading linear gradient versus higher-order neighbourhood structure beyond the first PC.
+The RNA UMAP projects the first 10 RNA-seq PCs into 2D using a nearest-neighbour graph. Compact clusters indicate groups of samples with highly similar transcriptional profiles. The UMAP1-PC1 correlation coefficient reported alongside this figure quantifies how much of the embedding reflects the leading linear gradient versus higher-order neighbourhood structure beyond the first PC.
 
 ---
 
@@ -187,7 +210,7 @@ Mutation signal in this AML targeted panel is heavily concentrated in a small nu
 
 ![Mutation Burden](MoBi_MultiOmic_4745778_Chua_files/figure-html/mutation-burden-plot-1.png)
 
-Most samples carry only 1–3 mutations in this targeted panel, and a substantial fraction carry none of the encoded events. The low median burden reflects that targeted panels capture known recurrent hotspots rather than the full somatic landscape. This sparsity makes Bernoulli likelihood modelling in MOFA the appropriate choice over a Gaussian assumption.
+Most samples carry only 1 to 3 mutations in this targeted panel, and a substantial fraction carry none of the encoded events. The low median burden reflects that targeted panels capture known recurrent hotspots rather than the full somatic landscape. This sparsity makes Bernoulli likelihood modelling in MOFA the appropriate choice over a Gaussian assumption.
 
 **Binary Mutation Heatmap**
 
@@ -199,7 +222,7 @@ Purple cells indicate mutation presence; light grey indicates absence. Dense ban
 
 ![Mutation PCA](MoBi_MultiOmic_4745778_Chua_files/figure-html/mutation-pca-plot-1.png)
 
-PCA on the binary mutation matrix separates samples primarily by recurrent genotype events. PC1 and PC2 together explain a lower fraction of total variance compared to RNA-seq, which is expected — each gene defines a partly independent binary axis rather than a continuous gradient, so mutation variance is distributed across many components.
+PCA on the binary mutation matrix separates samples primarily by recurrent genotype events. PC1 and PC2 together explain a lower fraction of total variance compared to RNA-seq, which is expected: each gene defines a partly independent binary axis rather than a continuous gradient, so mutation variance is distributed across many components.
 
 **Mutation Scree Plot**
 
@@ -233,7 +256,7 @@ The distribution of AUC values across all inhibitor-sample pairs characterises t
 
 ![Drug Heatmap](MoBi_MultiOmic_4745778_Chua_files/figure-html/drug-heatmap-1.png)
 
-Heatmap of the 40 most variable drug-response profiles after row-scaling. Blocks of samples with consistently high or low scaled AUC indicate coordinated drug-sensitivity patterns — the exact signal that MOFA's drug-response factor aims to capture. Row-scaling ensures that inhibitors with different absolute AUC ranges contribute equally to the visual display rather than being dominated by the widest-range drugs.
+Heatmap of the 40 most variable drug-response profiles after row-scaling. Blocks of samples with consistently high or low scaled AUC indicate coordinated drug-sensitivity patterns, which is the exact signal that MOFA's drug-response factor aims to capture. Row-scaling ensures that inhibitors with different absolute AUC ranges contribute equally to the visual display rather than being dominated by the widest-range drugs.
 
 **Drug Missingness Bar Chart**
 
@@ -263,7 +286,7 @@ A steep initial drop with PC1 dominant indicates a strong leading drug-response 
 
 ![Drug PCA Association Heatmap](MoBi_MultiOmic_4745778_Chua_files/figure-html/drug-pca-association-heatmap-1.png)
 
-Metadata associations with drug PCs reveal whether clinical variables — disease stage, induction response, genotype — explain coordinated drug-sensitivity axes. Associations between drug PC1 and induction therapy response or FLT3-ITD status are biologically expected in AML and would support the pharmacological relevance of the leading drug axis.
+Metadata associations with drug PCs reveal whether clinical variables (disease stage, induction response, genotype) explain coordinated drug-sensitivity axes. Associations between drug PC1 and induction therapy response or FLT3-ITD status are biologically expected in AML and would support the pharmacological relevance of the leading drug axis.
 
 **Drug UMAP**
 
@@ -291,7 +314,7 @@ MNN edges connect samples that are each other's mutual k-nearest neighbours in d
 
 ![PCA Combined Association](MoBi_MultiOmic_4745778_Chua_files/figure-html/pca-association-combined-1.png)
 
-All three views' PC–metadata associations are shown simultaneously. Vertical stripes — a metadata variable appearing dark across multiple PCs and views — indicate pervasive biological or technical effects acting across all omics layers. View-specific dark tiles indicate factors captured only by one omics layer, which is precisely the type of view-specific signal that MOFA is designed to separate from shared cross-view factors.
+All three views' PC-metadata associations are shown simultaneously. Vertical stripes (a metadata variable appearing dark across multiple PCs and views) indicate pervasive biological or technical effects acting across all omics layers. View-specific dark tiles indicate factors captured only by one omics layer, which is precisely the type of view-specific signal that MOFA is designed to separate from shared cross-view factors.
 
 **Cross-Omics PCA ANOVA / Kruskal-Wallis Comparison**
 
@@ -307,7 +330,7 @@ The side-by-side method comparison heatmap tests whether categorical metadata as
 
 ![MOFA Data Overview](MoBi_MultiOmic_4745778_Chua_files/figure-html/mofa-data-overview-1.png)
 
-The MOFA input tile plot shows observed (coloured) and missing (white) blocks across all three views before training. The union-sample design means that partially observed samples are retained in the model. Complete-case samples — those present in all three views — contribute the most information to cross-view factors, while partial samples still inform view-specific factors.
+The MOFA input tile plot shows observed (coloured) and missing (white) blocks across all three views before training. The union-sample design means that partially observed samples are retained in the model. Complete-case samples (those present in all three views) contribute the most information to cross-view factors, while partial samples still inform view-specific factors.
 
 **MOFA Total Variance Explained per View**
 
@@ -319,13 +342,13 @@ Total variance explained by all MOFA factors summed across each view. Views with
 
 ![MOFA Variance Plot](MoBi_MultiOmic_4745778_Chua_files/figure-html/mofa-variance-plot-1.png)
 
-Each cell shows how much variance a given factor explains in a given view. **Multi-view factors** — those with non-trivial R² in two or more views — represent coordinated molecular programmes linking transcription, genotype, and drug response simultaneously. **View-specific factors** — high R² in only one view — capture within-view variation not shared across modalities and are best interpreted through the weights of that single view.
+Each cell shows how much variance a given factor explains in a given view. **Multi-view factors** (those with non-trivial R² in two or more views) represent coordinated molecular programmes linking transcription, genotype, and drug response simultaneously. **View-specific factors** (high R² in only one view) capture within-view variation not shared across modalities and are best interpreted through the weights of that single view.
 
 **MOFA Factor Scatter (Factor 1 vs Factor 2)**
 
 ![MOFA Factor Scatter](MoBi_MultiOmic_4745778_Chua_files/figure-html/mofa-factor-scatter-1.png)
 
-Sample positions in the integrated latent space spanned by the two strongest MOFA factors. Factor 1 is the strongest multi-view axis, supported by variance contributions from RNA-seq and Drug AUC with a smaller mutation contribution. Factor 2 captures secondary structured variation. Sample separation in this plot reflects integrated molecular and pharmacological heterogeneity — not any single omics layer — making it more informative than any individual PCA plot.
+Sample positions in the integrated latent space spanned by the two strongest MOFA factors. Factor 1 is the strongest multi-view axis, supported by variance contributions from RNA-seq and Drug AUC with a smaller mutation contribution. Factor 2 captures secondary structured variation. Sample separation in this plot reflects integrated molecular and pharmacological heterogeneity (not any single omics layer) making it more informative than any individual PCA plot.
 
 **MOFA Factor Heatmap**
 
@@ -337,15 +360,15 @@ Sample scores across all learned MOFA factors, with rows representing factors an
 
 ![MOFA Factor Metadata](MoBi_MultiOmic_4745778_Chua_files/figure-html/mofa-factor-metadata-plot-1.png)
 
-Box and jitter plots showing how the strongest MOFA factor score distributes across the primary metadata grouping variable. Clear separation between group boxes supports a biologically meaningful factor–metadata association. Overlapping boxes indicate that the factor is better characterised through its feature weights and continuous metadata associations than as a clean categorical variable.
+Box and jitter plots showing how the strongest MOFA factor score distributes across the primary metadata grouping variable. Clear separation between group boxes supports a biologically meaningful factor-metadata association. Overlapping boxes indicate that the factor is better characterised through its feature weights and continuous metadata associations than as a clean categorical variable.
 
 **MOFA Feature Weights**
 
 ![MOFA Weight Plots](MoBi_MultiOmic_4745778_Chua_files/figure-html/mofa-weight-plots-1.png)
 
-Top absolute feature weights for each MOFA factor showing which genes (RNA view), mutation events (Mutation view), and inhibitors (Drug AUC view) load most strongly. Positive weights indicate features elevated in samples with high factor scores; negative weights indicate features elevated in samples with low scores. The sign of a factor is arbitrary — only the magnitude and relative ordering of weights carries biological meaning.
+Top absolute feature weights for each MOFA factor showing which genes (RNA view), mutation events (Mutation view), and inhibitors (Drug AUC view) load most strongly. Positive weights indicate features elevated in samples with high factor scores; negative weights indicate features elevated in samples with low scores. The sign of a factor is arbitrary: only the magnitude and relative ordering of weights carries biological meaning.
 
-**MOFA Factor–Metadata Association Heatmap**
+**MOFA Factor-Metadata Association Heatmap**
 
 ![MOFA Association Heatmap](MoBi_MultiOmic_4745778_Chua_files/figure-html/mofa-association-heatmap-1.png)
 
@@ -355,7 +378,7 @@ Dark cells indicate strong BH-adjusted associations between integrated MOFA fact
 
 ![MOFA ANOVA Kruskal Heatmap](MoBi_MultiOmic_4745778_Chua_files/figure-html/mofa-anova-kruskal-heatmap-1.png)
 
-Dual-panel heatmap placing ANOVA and Kruskal-Wallis adjusted p-values side by side for all categorical metadata–factor pairs. Factors with dark tiles in **both** panels for the same metadata variable have the most robust categorical associations, supported by both parametric and non-parametric evidence.
+Dual-panel heatmap placing ANOVA and Kruskal-Wallis adjusted p-values side by side for all categorical metadata-factor pairs. Factors with dark tiles in **both** panels for the same metadata variable have the most robust categorical associations, supported by both parametric and non-parametric evidence.
 
 ---
 
@@ -365,7 +388,7 @@ Dual-panel heatmap placing ANOVA and Kruskal-Wallis adjusted p-values side by si
 
 2. **Targeted mutation data** are sparse and event-driven. Recurrent AML driver genes (NPM1, FLT3-related events) dominate mutation PCA axes. Bernoulli likelihood modelling in MOFA is the statistically appropriate choice for binary 0/1 features over a Gaussian assumption.
 
-3. **Drug AUC profiles** show the strongest leading PC among all three views, suggesting a coordinated sensitivity–resistance gradient across the pharmacological panel. Systematic missingness in the drug view is the main constraint limiting the number of samples available for complete cross-view integration.
+3. **Drug AUC profiles** show the strongest leading PC among all three views, suggesting a coordinated sensitivity-resistance gradient across the pharmacological panel. Systematic missingness in the drug view is the main constraint limiting the number of samples available for complete cross-view integration.
 
 4. **MOFA2 integration** identifies latent factors that are either shared across views (multi-omics factors) or specific to individual views. The strongest factor is supported by variance contributions from both RNA-seq and drug-response, suggesting a functional transcriptional programme that is mechanistically linked to ex vivo pharmacological sensitivity in AML.
 
@@ -419,3 +442,7 @@ The build script will automatically:
 - Quarto (for `.qmd` rendering) or RStudio with bundled Quarto
 
 ---
+
+## License
+
+Released under the [MIT License](LICENSE).
