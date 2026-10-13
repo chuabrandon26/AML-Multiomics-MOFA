@@ -1,12 +1,12 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/visual-abstract-dark.svg">
-  <img alt="Visual abstract: multi-omics factor analysis (MOFA2) of 200 acute myeloid leukemia patients across RNA-seq, a 14-gene mutation panel and 95 ex vivo inhibitor responses. Factor 1 explains 28.2 percent of variance across all three views and links kinase-inhibitor response to FLT3-ITD and NPM1 genotype, while Factor 4 tracks NPM1 status." src="assets/visual-abstract-light.svg" width="100%">
+  <img alt="Visual abstract: multi-omics factor analysis (MOFA2) of a synthetic course dataset of 200 simulated acute myeloid leukemia patients across RNA-seq, a 14-gene mutation panel and 95 ex vivo inhibitor responses. Factor 1 explains 28.2 percent of variance across all three views and links kinase-inhibitor response to FLT3-ITD and NPM1 genotype, while Factor 4 tracks NPM1 status." src="assets/visual-abstract-light.svg" width="100%">
 </picture>
 
 <h1 align="center">AML Multi-Omics Integration with MOFA2</h1>
 
 <p align="center">
-  Transcriptome, targeted mutations and ex vivo drug response from 200 acute myeloid leukemia patients, integrated into shared latent factors
+  Transcriptome, targeted mutations and ex vivo drug response for 200 simulated acute myeloid leukemia patients (a synthetic course dataset), integrated into shared latent factors
 </p>
 
 <p align="center">
@@ -27,9 +27,9 @@
 
 | **200** | **3** | **8** | **28.2%** | **p < 0.001** |
 |:---:|:---:|:---:|:---:|:---:|
-| patients (union of views) | omics views integrated | MOFA latent factors | variance, Factor 1 (all views) | Factor 4 vs NPM1 status |
+| simulated patients (union of views) | omics views integrated | MOFA latent factors | variance, Factor 1 (all views) | Factor 4 vs NPM1 status |
 
-> **Take-home:** MOFA2 recovers a shared factor that links gene expression, kinase-inhibitor response and FLT3-ITD and NPM1 genotype, while a separate mutation-driven factor tracks NPM1 status. As a result, the integrated model reveals structure that no single omics layer shows on its own.
+> **Take-home:** on a synthetic AML dataset, MOFA2 recovers a shared factor that links gene expression, kinase-inhibitor response and FLT3-ITD and NPM1 genotype, while a separate mutation-driven factor tracks NPM1 status. As a result, the integrated model reveals structure that no single omics layer shows on its own.
 
 ## Skills demonstrated
 
@@ -44,7 +44,7 @@
 
 ## Project Overview
 
-This project presents a fully reproducible **multi-omics integrative analysis** of an Acute Myeloid Leukaemia (AML) patient cohort. Three molecular layers are jointly analysed:
+This project presents a fully reproducible **multi-omics integrative analysis** of a **synthetic** Acute Myeloid Leukaemia (AML) cohort provided as course data. The patients are simulated rather than real, so the project demonstrates the integration workflow and how to interpret it, not new clinical findings. Three molecular layers are jointly analysed:
 
 - **RNA-seq**: bulk transcriptomic profiles (gene expression counts)
 - **Targeted gene mutations**: binary somatic mutation calls across a curated AML panel
@@ -56,11 +56,13 @@ The analysis first characterises each omics layer independently through preproce
 
 ## Dataset Description
 
+> **Data source:** the four input files are a synthetic teaching dataset distributed with the multi-omics course. They follow the structure of AML multi-omics data (RNA-seq counts, a targeted mutation panel, ex vivo inhibitor AUCs and clinical annotations), but they do not come from real patients and are not included in this repository.
+
 | File | Description | Format |
 |------|-------------|--------|
-| `rnacount.tsv` | Gene-by-sample raw count matrix | Feature × Sample |
-| `genemutation.tsv` | Long-format binary mutation calls (sample, gene, value) | Long table |
-| `drugauc.tsv` | Long-format inhibitor AUC measurements (sample, inhibitor, AUC) | Long table |
+| `rna_count.tsv` | Gene-by-sample raw count matrix | Feature × Sample |
+| `gene_mutation.tsv` | Long-format binary mutation calls (sample, gene, value) | Long table |
+| `drug_auc.tsv` | Long-format inhibitor AUC measurements (sample, inhibitor, AUC) | Long table |
 | `metadata.tsv` | Clinical & sample-level annotations | Sample × Variable |
 
 **Key clinical variables:** specimen type, vital status, disease stage, induction therapy response, age, white blood cell count, FLT3-ITD status, NPM1 mutation status, sex, ethnicity, processing centre ID.
@@ -384,13 +386,15 @@ Dual-panel heatmap placing ANOVA and Kruskal-Wallis adjusted p-values side by si
 
 ## Conclusions
 
+These conclusions describe patterns in a simulated dataset. Consequently, they show what the workflow can recover, and any biological claim would need confirmation in a real AML cohort.
+
 1. **RNA-seq** reveals a broad transcriptional landscape with variance distributed across multiple programmes, likely capturing cell state, disease stage, and specimen composition effects simultaneously. Library-size normalisation and VST are essential prerequisites before any distance-based analysis.
 
 2. **Targeted mutation data** are sparse and event-driven. Recurrent AML driver genes (NPM1, FLT3-related events) dominate mutation PCA axes. Bernoulli likelihood modelling in MOFA is the statistically appropriate choice for binary 0/1 features over a Gaussian assumption.
 
 3. **Drug AUC profiles** show the strongest leading PC among all three views, suggesting a coordinated sensitivity-resistance gradient across the pharmacological panel. Systematic missingness in the drug view is the main constraint limiting the number of samples available for complete cross-view integration.
 
-4. **MOFA2 integration** identifies latent factors that are either shared across views (multi-omics factors) or specific to individual views. The strongest factor is supported by variance contributions from both RNA-seq and drug-response, suggesting a functional transcriptional programme that is mechanistically linked to ex vivo pharmacological sensitivity in AML.
+4. **MOFA2 integration** identifies latent factors that are either shared across views (multi-omics factors) or specific to individual views. The strongest factor is supported by variance contributions from both RNA-seq and drug-response, suggesting a transcriptional programme linked to ex vivo pharmacological sensitivity in the simulated cohort.
 
 5. **Statistical associations** using ANOVA and Kruskal-Wallis confirm that several MOFA factors and PCA components are non-randomly associated with clinical variables including disease stage, genotype status, and induction therapy response. All associations are exploratory given the unsupervised analysis framework and should be treated as hypotheses for experimental follow-up.
 
@@ -398,6 +402,7 @@ Dual-panel heatmap placing ANOVA and Kruskal-Wallis adjusted p-values side by si
 
 ## Limitations
 
+- **Synthetic data:** the course dataset is simulated, so the factors and associations reported here would need to be reproduced in a real AML cohort (for example BeatAML) before drawing biological conclusions
 - **Sample size:** The complete-case intersection is smaller than individual assay sample counts; the union-sample MOFA approach partially mitigates this but does not fully resolve reduced power for cross-view factors
 - **Targeted mutation panel:** Only recurrent hotspot genes are captured; copy-number alterations, clonal architecture, and epigenetic events are absent
 - **Ex vivo pharmacology:** AUC measurements may not fully recapitulate in vivo drug sensitivity due to differences in tumour microenvironment, systemic pharmacokinetics, and stromal interactions

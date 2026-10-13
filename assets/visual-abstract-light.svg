@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 752" width="1000" height="752" role="img" aria-labelledby="t d">
 <title id="t">Visual abstract: Integrating RNA, mutations and drug response in AML</title>
-<desc id="d">Multi-omics factor analysis (MOFA2) of 200 acute myeloid leukemia patients across RNA-seq, a 14-gene mutation panel and 95 ex vivo inhibitor responses. Factor 1 explains 28.2 percent of variance across all three views and links kinase-inhibitor response to FLT3-ITD and NPM1 genotype, while Factor 4 tracks NPM1 status (adjusted p below 0.001).</desc>
+<desc id="d">Multi-omics factor analysis (MOFA2) of a synthetic course dataset of 200 simulated acute myeloid leukemia patients across RNA-seq, a 14-gene mutation panel and 95 ex vivo inhibitor responses. Factor 1 explains 28.2 percent of variance across all three views and links kinase-inhibitor response to FLT3-ITD and NPM1 genotype, while Factor 4 tracks NPM1 status (adjusted p below 0.001).</desc>
 <style>
   text { font-family: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', sans-serif; fill: #15202b; }
   .bgcard { fill: #f6f8fa; stroke: #d7dee6; }
@@ -60,6 +60,8 @@
   .m-gene { stroke: #566573; stroke-width: 1.4; }
   .m-exon { fill: #566573; }
   .m-tissue { fill: #e9eef3; stroke: #566573; stroke-width: 1.2; }
+  .m-tissue.fillonly { stroke: none; }
+  .m-tissue.outline { fill: none; stroke-width: 1.6; }
   .m-ring { fill: none; stroke: #15202b; stroke-width: 2; stroke-dasharray: 3 2; animation: pulse 3.2s ease-in-out infinite; }
   .m-cell { stroke: #ffffff; stroke-width: 1.2; }
   .m-radius { fill: #1f8f6a; fill-opacity: .08; stroke: #1f8f6a; stroke-width: 1.6; stroke-dasharray: 4 3; }
@@ -104,9 +106,9 @@
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
 </style>
 <rect x="0.5" y="0.5" width="999" height="751" rx="18" class="bgcard"/>
-<text x="36.0" y="44.0" class="eyebrow">VISUAL ABSTRACT  ·  MULTI-OMICS INTEGRATION  ·  MOFA2  ·  ACUTE MYELOID LEUKEMIA</text>
+<text x="36.0" y="44.0" class="eyebrow">VISUAL ABSTRACT  ·  MULTI-OMICS INTEGRATION  ·  MOFA2  ·  SYNTHETIC AML COURSE DATA</text>
 <text x="36.0" y="79.0" class="title">Integrating RNA, mutations and drug response in AML</text>
-<text x="36.0" y="106.0" class="sub">MOFA2 factor analysis of 200 AML patients across RNA-seq, a targeted mutation panel and an ex vivo drug screen</text>
+<text x="36.0" y="106.0" class="sub">MOFA2 factor analysis of 200 simulated AML patients across RNA-seq, a targeted mutation panel and an ex vivo drug screen</text>
 <rect x="36" y="128" width="296" height="368" rx="12" class="panel"/><text x="52.0" y="154.0" class="eyebrow">QUESTION</text><text x="52.0" y="176.0" class="h2">Which axes do the omics share?</text>
 <text x="52.0" y="217.7" class="m-lab">RNA</text>
 <rect x="98.0" y="196.0" width="9" height="5.7" class="m-cellf cx" style="opacity:0.61"/>
@@ -285,7 +287,7 @@
 <text x="68.0" y="470.0" class="qmark-t" text-anchor="middle">?</text>
 <text x="86.0" y="461.0" class="q">Which latent factors connect RNA,</text>
 <text x="86.0" y="477.0" class="q">mutations and ex vivo drug response?</text>
-<rect x="352" y="128" width="296" height="368" rx="12" class="panel"/><text x="368.0" y="154.0" class="eyebrow">DATA AND DESIGN</text><text x="368.0" y="176.0" class="h2">200 patients, three views</text>
+<rect x="352" y="128" width="296" height="368" rx="12" class="panel"/><text x="368.0" y="154.0" class="eyebrow">DATA AND DESIGN</text><text x="368.0" y="176.0" class="h2">200 simulated patients</text>
 <rect x="368" y="192" width="128" height="66" rx="8" class="statbox"/>
 <text x="380.0" y="222.0" class="num">200</text>
 <text x="380.0" y="239.0" class="small">patients (union)</text>
